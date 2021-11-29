@@ -27,6 +27,7 @@ function App() {
 	const isSixCol = useMediaQuery(theme.breakpoints.up('xl'));
 	const isFourCol = useMediaQuery(theme.breakpoints.between('lg', 'xl'));
 	const isTwoCol = useMediaQuery(theme.breakpoints.only('md'));
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
 	const [submitNote, setSubmitNote] = useState({
 		name: 'Anonymous',
@@ -95,7 +96,7 @@ function App() {
 	}
 
 	return (
-		<Box sx={{p: 5}}>
+		<Box sx={{p: isMobile ? 1 : 5}}>
 			<Box sx={{pb: 3, m: 1}}>
 				<Card sx={{maxWidth: 460}}>
 					<Box sx={{
