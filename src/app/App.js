@@ -4,25 +4,37 @@ import {
 	Card,
 	CardActions,
 	CardContent,
-	Container,
 	FormControl,
 	FormControlLabel,
+	FormGroup,
 	FormLabel,
-	Grid,
+	Grow,
 	Radio,
 	RadioGroup,
-	TextField
+	Switch,
+	TextField,
+	Typography,
+	useMediaQuery,
+	useTheme
 } from "@mui/material";
 import {useEffect, useState} from "react";
 import {addPrayNote, listenPrayNotes} from "./service/firebase";
+import {getCountry} from "./service/geo";
 
 function App() {
+	const theme = useTheme();
+	const isSixCol = useMediaQuery(theme.breakpoints.up('xl'));
+	const isFourCol = useMediaQuery(theme.breakpoints.between('lg', 'xl'));
+	const isTwoCol = useMediaQuery(theme.breakpoints.only('md'));
+
 	const [submitNote, setSubmitNote] = useState({
-		name: '',
+		name: 'Anonymous',
 		type: 'pray',
 		content: '',
+		country: '',
 	});
 	const [notes, setNotes] = useState([]);
+	const [useCountry, setUserCountry] = useState(false);
 
 	useEffect(() => {
 		const unsubscribe = listenPrayNotes((snapshots) => {
@@ -31,9 +43,10 @@ function App() {
 				const d = doc.data();
 				n.push({
 					id: doc.id,
-					name: d.name,
-					type: d.type,
-					content: d.content,
+					name: d.name ?? 'Anonymous',
+					type: d.type ?? 'pray',
+					content: d.content ?? '',
+					country: d.country ?? '',
 					created: new Date(d.created.seconds * 1000),
 				});
 			});
@@ -43,19 +56,52 @@ function App() {
 		return () => unsubscribe();
 	}, [setNotes]);
 
+	const onChangeCountry = async (use) => {
+		if (use && !submitNote.country) {
+			const country = await getCountry();
+
+			setSubmitNote(Object.assign({}, submitNote, {
+				country: country ?? '',
+			}));
+		}
+
+		setUserCountry(use);
+	};
+
 	const onSubmit = async () => {
+		if (submitNote.content === '') {
+			return;
+		}
+
 		await addPrayNote(submitNote);
+
 		setSubmitNote({
-			name: '',
+			name: 'Anonymous',
 			type: 'pray',
 			content: '',
+			country: submitNote.country,
 		})
 	};
 
+	const colNum = isSixCol ? 6 : isFourCol ? 4 : isTwoCol ? 2 : 1;
+
+	const cols = [];
+	for (let i = 0; i < colNum; i++) {
+		cols.push([]);
+	}
+	for (let i = 0; i < notes.length; i++) {
+		cols[i % colNum].push(notes[i]);
+	}
+
 	return (
-		<Container fixed sx={{py: 5}}>
-			<Box sx={{pb: 3}}>
+		<Box sx={{p: 5}}>
+			<Box sx={{pb: 3, m: 1}}>
 				<Card sx={{maxWidth: 460}}>
+					<Box sx={{
+						width: '100%',
+						height: '0.4rem',
+						background: '#3265FF'
+					}}/>
 					<CardContent>
 						<div>
 							<TextField
@@ -66,9 +112,10 @@ function App() {
 								onChange={(event) => setSubmitNote(Object.assign({}, submitNote, {
 									name: event.target.value,
 								}))}
+								fullWidth
 							/>
 						</div>
-						<div>
+						<Box sx={{py: 1}}>
 							<FormControl component="fieldset">
 								<FormLabel component="legend">I want to</FormLabel>
 								<RadioGroup
@@ -84,7 +131,7 @@ function App() {
 									<FormControlLabel value="praise" control={<Radio/>} label="Praise"/>
 								</RadioGroup>
 							</FormControl>
-						</div>
+						</Box>
 						<div>
 							<TextField
 								id="outlined-multiline-static"
@@ -95,7 +142,16 @@ function App() {
 								onChange={(event) => setSubmitNote(Object.assign({}, submitNote, {
 									content: event.target.value,
 								}))}
+								fullWidth
 							/>
+						</div>
+						<div>
+							<FormGroup>
+								<FormControlLabel control={<Switch
+									value={useCountry}
+									onChange={(event) => onChangeCountry(event.target.checked)}
+								/>} label={useCountry && submitNote.country ? submitNote.country : 'Show my country'}/>
+							</FormGroup>
 						</div>
 					</CardContent>
 					<CardActions>
@@ -106,21 +162,49 @@ function App() {
 				</Card>
 			</Box>
 			<div>
-				<Grid container spacing={2}>
+				<Box sx={{display: 'flex', flexWrap: 'wrap'}}>
 					{
-						notes && notes.map((note) => (
-							<Grid item key={note.id}>
-								<Card>
-									<CardContent>
-										{JSON.stringify(note)}
-									</CardContent>
-								</Card>
-							</Grid>
+						cols.map((row) => (
+							<Box sx={{
+								flex: (100.0 / colNum) + '%',
+								maxWidth: (100.0 / colNum) + '%',
+							}}>
+								{row.map((note) => (
+									<Grow in={true}>
+										<Card sx={{
+											minHeight: 120,
+											verticalAlign: 'middle',
+											mt: 3,
+											mx: 1,
+										}}>
+											<Box sx={{
+												width: '100%',
+												height: '0.4rem',
+												background: '#3265FF'
+											}}/>
+											<CardContent>
+												<Typography variant={'h6'} component={'div'} sx={{pb: 1}}>
+													{note.name}
+
+													{note.country && (
+														<Typography color={'text.secondary'} variant={'caption'} sx={{pl: 1}}>
+															{note.country}
+														</Typography>
+													)}
+												</Typography>
+												<Typography variant={'body1'} component={'p'}>
+													{note.content}
+												</Typography>
+											</CardContent>
+										</Card>
+									</Grow>
+								))}
+							</Box>
 						))
 					}
-				</Grid>
+				</Box>
 			</div>
-		</Container>
+		</Box>
 	);
 }
 

@@ -16,10 +16,13 @@ export const firebaseApp = initializeApp(firebaseConfig);
 export const firebaseFirestore = getFirestore(firebaseApp);
 export const firebaseAnalytics = getAnalytics(firebaseApp);
 
-export const addPrayNote = async ({name, type, content}) => {
+export const addPrayNote = async ({name, type, content, country}) => {
 	const key = collection(firebaseFirestore, 'praynotes');
 	return await addDoc(key, {
-		name, type, content,
+		name: (name || 'Anonymous').trim(),
+		type: type || 'pray',
+		content: content.trim(),
+		country,
 		created: new Date(),
 	});
 }
