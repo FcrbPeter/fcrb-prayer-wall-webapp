@@ -77,7 +77,7 @@ function App() {
 		await addPrayNote(submitNote);
 
 		setSubmitNote({
-			name: 'Anonymous',
+			name: submitNote.name ?? 'Anonymous',
 			type: 'prayer',
 			content: '',
 			country: submitNote.country,
