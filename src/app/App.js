@@ -7,7 +7,6 @@ import {
 	FormControl,
 	FormControlLabel,
 	FormGroup,
-	FormLabel,
 	Grow,
 	Radio,
 	RadioGroup,
@@ -31,7 +30,7 @@ function App() {
 
 	const [submitNote, setSubmitNote] = useState({
 		name: 'Anonymous',
-		type: 'pray',
+		type: 'prayer',
 		content: '',
 		country: '',
 	});
@@ -46,7 +45,7 @@ function App() {
 				n.push({
 					id: doc.id,
 					name: d.name ?? 'Anonymous',
-					type: d.type ?? 'pray',
+					type: d.type ?? 'prayer',
 					content: d.content ?? '',
 					country: d.country ?? '',
 					created: new Date(d.created.seconds * 1000),
@@ -79,7 +78,7 @@ function App() {
 
 		setSubmitNote({
 			name: 'Anonymous',
-			type: 'pray',
+			type: 'prayer',
 			content: '',
 			country: submitNote.country,
 		})
@@ -119,7 +118,6 @@ function App() {
 						</div>
 						<Box sx={{py: 1}}>
 							<FormControl component="fieldset">
-								<FormLabel component="legend">I want to</FormLabel>
 								<RadioGroup
 									row
 									aria-label="I want to"
@@ -129,7 +127,7 @@ function App() {
 										type: event.target.value,
 									}))}
 								>
-									<FormControlLabel value="pray" control={<Radio/>} label="Pray"/>
+									<FormControlLabel value="prayer" control={<Radio/>} label="Prayer"/>
 									<FormControlLabel value="praise" control={<Radio/>} label="Praise"/>
 								</RadioGroup>
 							</FormControl>
@@ -172,7 +170,7 @@ function App() {
 								maxWidth: (100.0 / colNum) + '%',
 							}}>
 								{row.map((note) => (
-									<Grow in={true}>
+									<Grow in={true} timeout={800}>
 										<Card sx={{
 											minHeight: 120,
 											verticalAlign: 'middle',
@@ -195,8 +193,8 @@ function App() {
 													)}
 
 													<Box sx={{float: 'right'}}>
-														{note.type === 'pray' && <PrayIcon />}
-														{note.type === 'praise' && <PraiseIcon />}
+														{note.type === 'prayer' && <PrayIcon/>}
+														{note.type === 'praise' && <PraiseIcon/>}
 													</Box>
 												</Typography>
 												<Typography variant={'body1'} component={'p'}>
