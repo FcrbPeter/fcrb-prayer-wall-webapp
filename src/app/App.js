@@ -20,6 +20,8 @@ import {
 import {useEffect, useState} from "react";
 import {addPrayNote, listenPrayNotes} from "./service/firebase";
 import {getCountry} from "./service/geo";
+import {PrayIcon} from "./icons/PrayIcon";
+import {PraiseIcon} from "./icons/PraiseIcon";
 
 function App() {
 	const theme = useTheme();
@@ -187,10 +189,15 @@ function App() {
 													{note.name}
 
 													{note.country && (
-														<Typography color={'text.secondary'} variant={'caption'} sx={{pl: 1}}>
+														<Typography color={'text.secondary'} variant={'caption'} component={'span'} sx={{pl: 1}}>
 															{note.country}
 														</Typography>
 													)}
+
+													<Box sx={{float: 'right'}}>
+														{note.type === 'pray' && <PrayIcon />}
+														{note.type === 'praise' && <PraiseIcon />}
+													</Box>
 												</Typography>
 												<Typography variant={'body1'} component={'p'}>
 													{note.content}
