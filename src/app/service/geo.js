@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const apiKey = process.env.REACT_APP_GEOCODING;
+
 const hasGeo = !!navigator.geolocation;
 
 const geoOptions = {
@@ -25,8 +27,6 @@ const getGeoLocation = async () => {
 		return null;
 	}
 }
-
-const apiKey = process.env.REACT_APP_GEOCODING;
 
 export const getCountry = async () => {
 	if (!apiKey) {

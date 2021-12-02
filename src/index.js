@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './app/App';
 import reportWebVitals from './reportWebVitals';
+import {loadGeocode} from "./app/service/geo";
+
+loadGeocode().then(_ => {});
 
 ReactDOM.render(
   <React.StrictMode>
